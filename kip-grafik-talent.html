@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>KIP — Papan Kompetisi Talent</title>
+<meta name="theme-color" content="#1D9E75">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231D9E75'/%3E%3Ctext x='50' y='60' font-size='30' fill='white' text-anchor='middle' font-family='sans-serif' font-weight='bold'%3EKIP%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231D9E75'/%3E%3Ctext x='50' y='60' font-size='30' fill='white' text-anchor='middle' font-family='sans-serif' font-weight='bold'%3EKIP%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/dist/tabler-icons.min.css">
+<style>
+:root{
+  --surface-0:#F7F6F2;
+  --surface-1:#EFEDE7;
+  --surface-2:#FFFFFF;
+  --border:#DFDCD3;
+  --text-primary:#1A1A18;
+  --text-secondary:#6B6963;
+  --text-muted:#9B988F;
+  --radius:10px;
+  --green:#1D9E75;
+  --green-dark:#0F6E56;
+  --green-bg:#E1F5EE;
+  --green-border:#9FE1CB;
+  --red:#A32D2D;
+  --red-bg:#FCEBEB;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--surface-1);}
+.app{max-width:480px;margin:0 auto;background:var(--surface-0);min-height:100vh;display:flex;flex-direction:column;box-shadow:0 0 40px rgba(0,0,0,0.08);}
+.header{background:var(--surface-2);border-bottom:.5px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:12px}
+.logo{width:36px;height:36px;background:var(--green);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:13px;flex-shrink:0}
+.header h1{font-size:15px;font-weight:500;color:var(--text-primary)}
+.header p{font-size:12px;color:var(--text-secondary)}
+.header-spacer{flex:1}
+.gear-btn{width:32px;height:32px;border-radius:8px;border:.5px solid var(--border);background:var(--surface-1);color:var(--text-muted);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;flex-shrink:0}
+.gear-btn:hover{background:var(--surface-2);color:var(--text-secondary)}
+.page{padding:16px;flex:1}
+.card{background:var(--surface-2);border:.5px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px}
+.stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.sc{background:var(--surface-1);border-radius:var(--radius);padding:10px 12px}
+.sc-label{font-size:11px;color:var(--text-secondary);margin-bottom:4px}
+.sc-val{font-size:22px;font-weight:500;color:var(--text-primary)}
+.sc-val.green{color:var(--green-dark)}
+.filter-row{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px}
+.chip{padding:5px 12px;border-radius:20px;border:.5px solid var(--border);background:var(--surface-1);font-size:12px;cursor:pointer;white-space:nowrap;color:var(--text-secondary);font-weight:500}
+.chip.active{background:var(--green);border-color:var(--green);color:#fff}
+.chart-wrap{position:relative;width:100%}
+.pi{display:flex;align-items:center;gap:10px;padding:9px 10px;background:var(--surface-1);border:.5px solid var(--border);border-radius:var(--radius);margin-bottom:6px;position:relative;overflow:hidden}
+.pi.r1{background:var(--green-bg);border-color:var(--green-border)}
+.pi-rank{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0}
+.pi-rank.k1{background:var(--green);color:#fff}
+.pi-rank.k2{background:#D3D1C7;color:#444}
+.pi-rank.k3{background:#B4B2A9;color:#fff}
+.pi-rank.kn{background:var(--surface-0);color:var(--text-muted);font-size:11px}
+.pi-name{flex:1;font-size:13px;font-weight:500;color:var(--text-primary)}
+.pi-sub{font-size:10px;color:var(--text-secondary)}
+.pi-count{font-size:18px;font-weight:500;color:var(--text-primary)}
+.pi-bar-bg{position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--surface-0)}
+.pi-bar{height:100%;background:var(--green);transition:width .6s ease}
+.mbadge{background:var(--green-bg);color:var(--green-dark);font-size:11px;padding:3px 10px;border-radius:4px;font-weight:500}
+.empty{text-align:center;padding:24px;color:var(--text-muted);font-size:13px}
+.empty i{font-size:28px;display:block;margin-bottom:8px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green-dark);color:#fff;padding:10px 20px;border-radius:20px;font-size:14px;font-weight:500;z-index:999;transition:transform .25s;pointer-events:none;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.err{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* settings modal (hanya URL Sheets, read-only source, tidak ada input kode / kelola talent) */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.hidden{display:none}
+.modal{background:var(--surface-2);border-radius:14px;padding:20px;width:100%;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,0.2)}
+.modal-title{font-size:16px;font-weight:500;color:var(--text-primary);margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--text-secondary);margin-bottom:16px;line-height:1.5}
+.url-input{width:100%;padding:10px 12px;font-size:13px;border:1.5px solid var(--border);border-radius:var(--radius);background:var(--surface-2);color:var(--text-primary);outline:none;transition:border-color .15s;margin-bottom:8px}
+.url-input:focus{border-color:var(--green)}
+.gs-status{font-size:12px;padding:8px 12px;border-radius:var(--radius);margin-top:6px;display:none;line-height:1.5}
+.gs-status.ok{background:var(--green-bg);color:#085041;display:block}
+.gs-status.fail{background:var(--red-bg);color:#791F1F;display:block}
+.modal-actions{display:flex;gap:8px;margin-top:16px}
+.modal-actions .btn-cancel{flex:1;padding:11px;background:transparent;border:.5px solid var(--border);border-radius:var(--radius);font-size:14px;cursor:pointer;color:var(--text-secondary)}
+.modal-actions .btn-cancel:hover{background:var(--surface-1)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="logo">KIP</div>
+    <div>
+      <h1>Papan Kompetisi Talent</h1>
+      <p>Kopma Influence Partner</p>
+    </div>
+    <div class="header-spacer"></div>
+    <button class="gear-btn" onclick="openModal('modal-settings')" title="Atur sumber data" aria-label="Pengaturan"><i class="ti ti-settings" aria-hidden="true"></i></button>
+  </div>
+
+  <div class="page">
+    <div class="stat-row">
+      <div class="sc"><div class="sc-label">Total kode</div><div class="sc-val green" id="stat-total">0</div></div>
+      <div class="sc"><div class="sc-label">Talent aktif</div><div class="sc-val" id="stat-active">0</div></div>
+      <div class="sc"><div class="sc-label">Bulan ini</div><div class="sc-val" id="stat-month" style="font-size:13px;padding-top:5px">-</div></div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-size:14px;font-weight:500;color:var(--text-primary)">Papan kompetisi</div>
+          <div style="display:flex;align-items:center;gap:4px;background:#E1F5EE;border:.5px solid #9FE1CB;border-radius:20px;padding:2px 8px">
+            <div id="live-dot" style="width:6px;height:6px;border-radius:50%;background:#B4B2A9;animation:none" aria-hidden="true"></div>
+            <span style="font-size:11px;font-weight:500;color:#0F6E56">LIVE</span>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <span class="mbadge" id="month-label">-</span>
+          <div id="grafik-sync-time" style="display:none;font-size:10px;color:var(--text-muted);margin-top:2px"></div>
+        </div>
+      </div>
+      <div class="filter-row">
+        <button class="chip active" onclick="filterOutlet(this,'Semua')">Semua unit</button>
+        <button class="chip" onclick="filterOutlet(this,'Minimarket Kopma UNY')">Minimarket</button>
+        <button class="chip" onclick="filterOutlet(this,'Ayam Geprek Sarjana')">Geprek</button>
+        <button class="chip" onclick="filterOutlet(this,'Oleker by Kopma UNY')">Oleker</button>
+        <button class="chip" onclick="filterOutlet(this,'Jasa dan Persewaan Kopma UNY')">Jasa</button>
+      </div>
+      <div class="chart-wrap"><canvas id="chartCanvas" role="img" aria-label="Grafik kompetisi kode talent KIP"></canvas></div>
+    </div>
+    <div class="card">
+      <div style="font-size:14px;font-weight:500;color:var(--text-primary);margin-bottom:10px">Ranking talent</div>
+      <div id="podium-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL — hanya untuk atur URL sumber data (read-only), tidak ada fungsi input kode / kelola talent -->
+<div class="modal-overlay hidden" id="modal-settings">
+  <div class="modal">
+    <div class="modal-title"><i class="ti ti-brand-google" aria-hidden="true" style="margin-right:6px"></i>Sumber data Google Sheets</div>
+    <div class="modal-sub">Halaman ini hanya menampilkan papan kompetisi secara <b>real-time</b>. Tidak ada fungsi input kode atau kelola talent di sini — itu khusus di aplikasi Kasir.</div>
+    <input class="url-input" id="gsUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" oninput="saveGsUrl()">
+    <button class="chip" style="width:100%;justify-content:center;display:flex;padding:10px;background:var(--green);color:#fff;border-color:var(--green)" onclick="testConnection()">
+      <i class="ti ti-plug" aria-hidden="true" style="margin-right:6px"></i>Test &amp; sinkron
+    </button>
+    <div id="url-status" class="gs-status"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-settings')">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// =====================================================================
+// PAPAN KOMPETISI TALENT — VIEW ONLY
+// Tidak ada input kode kasir, tidak ada kelola talent, tidak ada rekap/export.
+// Data ditarik dari Google Sheets yang sama (real-time, read-only).
+// =====================================================================
+const MN = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+let TALENTS = [];
+let allData = [];
+let activeFilter = 'Semua';
+let barChart = null;
+let syncTimer = null, talentSyncTimer = null, isSyncing = false;
+
+function getMonthStr() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+function getGsUrl() { return localStorage.getItem('kip_gs_url') || ''; }
+function saveGsUrl() {
+  const v = document.getElementById('gsUrl').value.trim();
+  localStorage.setItem('kip_gs_url', v);
+  const st = document.getElementById('url-status');
+  if (v.includes('script.google.com')) { st.className = 'gs-status ok'; st.textContent = 'URL tersimpan.'; startSync(); }
+  else if (v) { st.className = 'gs-status fail'; st.textContent = 'URL tidak valid.'; }
+  else { st.className = 'gs-status'; }
+}
+
+let jsonpCounter = 0;
+function jsonpRequest(url, timeoutMs = 8000) {
+  return new Promise((resolve, reject) => {
+    const cbName = 'kipCb_' + (jsonpCounter++) + '_' + Date.now();
+    const script = document.createElement('script');
+    let done = false;
+    const cleanup = () => {
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+      clearTimeout(timer);
+    };
+    const timer = setTimeout(() => { if (done) return; done = true; cleanup(); reject(new Error('timeout')); }, timeoutMs);
+    window[cbName] = (data) => { if (done) return; done = true; cleanup(); resolve(data); };
+    script.onerror = () => { if (done) return; done = true; cleanup(); reject(new Error('script load failed')); };
+    const sep = url.includes('?') ? '&' : '?';
+    script.src = url + sep + 'callback=' + cbName;
+    document.head.appendChild(script);
+  });
+}
+
+async function loadTalents() {
+  const url = getGsUrl(); if (!url) return;
+  try {
+    const json = await jsonpRequest(url + '?action=read-talents&t=' + Date.now(), 8000);
+    if (json.status === 'ok' && Array.isArray(json.talents)) TALENTS = json.talents;
+  } catch(e) {}
+}
+
+async function fetchCloud(manual) {
+  const url = getGsUrl();
+  if (!url) { if (manual) showToast('Sumber data belum diatur.', true); return; }
+  if (isSyncing) return;
+  isSyncing = true;
+  try {
+    const json = await jsonpRequest(url + '?action=read&t=' + Date.now(), 10000);
+    if (json.status === 'ok' && Array.isArray(json.data)) {
+      allData = json.data.filter(d => d.name && d.code && d.outlet);
+      renderGrafik();
+      const timeStr = new Date().toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      updateSyncIndicator(timeStr);
+      if (manual) {
+        const st = document.getElementById('url-status');
+        st.className = 'gs-status ok'; st.textContent = `Tersinkron! ${json.data.length} baris data ditemukan.`;
+      }
+    } else if (manual) {
+      const st = document.getElementById('url-status');
+      st.className = 'gs-status fail'; st.textContent = 'Format respons tidak dikenali.';
+    }
+  } catch(e) {
+    if (manual) {
+      const st = document.getElementById('url-status');
+      st.className = 'gs-status fail'; st.textContent = 'Gagal terhubung. Cek URL dan koneksi internet.';
+    }
+  } finally {
+    isSyncing = false;
+  }
+}
+
+function updateSyncIndicator(timeStr) {
+  const el = document.getElementById('grafik-sync-time');
+  if (el) { el.textContent = 'Update ' + timeStr; el.style.display = 'block'; }
+  const dot = document.getElementById('live-dot');
+  if (dot) { dot.style.background = '#1D9E75'; dot.style.animation = 'pulse 2s ease-in-out infinite'; }
+}
+
+function startSync() {
+  fetchCloud(false);
+  loadTalents().then(() => renderGrafik());
+  if (syncTimer) clearInterval(syncTimer);
+  syncTimer = setInterval(() => { if (!document.hidden) fetchCloud(false); }, 5000);
+  if (talentSyncTimer) clearInterval(talentSyncTimer);
+  talentSyncTimer = setInterval(() => { if (!document.hidden) loadTalents().then(() => renderGrafik()); }, 15000);
+}
+
+async function testConnection() {
+  const url = getGsUrl();
+  const st = document.getElementById('url-status');
+  if (!url) { st.className = 'gs-status fail'; st.textContent = 'Masukkan URL terlebih dahulu.'; return; }
+  st.className = 'gs-status'; st.textContent = '';
+  await loadTalents();
+  await fetchCloud(true);
+}
+
+function getCounts(filter) {
+  const month = getMonthStr();
+  const src = allData.filter(d => d.month === month && (!filter || filter === 'Semua' || d.outlet === filter));
+  const map = {};
+  TALENTS.forEach(t => map[t.code] = {code:t.code, name:t.name, count:0, outlets:{}});
+  src.forEach(d => {
+    if (!map[d.code]) map[d.code] = {code:d.code, name:d.name, count:0, outlets:{}};
+    map[d.code].count++;
+    map[d.code].outlets[d.outlet] = (map[d.code].outlets[d.outlet] || 0) + 1;
+  });
+  return Object.values(map).sort((a, b) => b.count - a.count);
+}
+
+function renderGrafik() {
+  const counts = getCounts(activeFilter);
+  const total = counts.reduce((s, c) => s + c.count, 0);
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-active').textContent = counts.filter(c => c.count > 0).length;
+  const now = new Date(); const ml = `${MN[now.getMonth()]} ${now.getFullYear()}`;
+  document.getElementById('month-label').textContent = ml;
+  document.getElementById('stat-month').textContent = ml;
+  const top = counts.slice(0, 10);
+  document.querySelector('.chart-wrap').style.height = Math.max(260, top.length * 30 + 60) + 'px';
+  if (barChart) { barChart.destroy(); barChart = null; }
+  barChart = new Chart(document.getElementById('chartCanvas'), {
+    type: 'bar',
+    data: {
+      labels: top.map(c => c.name.split(' ')[0]),
+      datasets: [{label:'Kode bulan ini', data:top.map(c => c.count),
+        backgroundColor: top.map((_,i) => i===0?'#1D9E75':i===1?'#5DCAA5':i===2?'#9FE1CB':'#D3D1C7'),
+        borderRadius:4, borderSkipped:'start'}]
+    },
+    options: {
+      indexAxis: 'y', responsive:true, maintainAspectRatio:false,
+      plugins: {legend:{display:false}, tooltip:{callbacks:{label:ctx=>`${ctx.raw} kode`}}},
+      scales: {
+        x: {beginAtZero:true, ticks:{stepSize:1,color:'#898781',font:{size:11}}, grid:{color:'rgba(0,0,0,0.05)'}, border:{display:false}},
+        y: {ticks:{color:'#0b0b0b',font:{size:12,weight:'500'}}, grid:{display:false}, border:{display:false}}
+      }
+    }
+  });
+  const all = getCounts('Semua'); const max = all[0]?.count || 1;
+  const pod = document.getElementById('podium-list');
+  const wd = all.filter(c => c.count > 0);
+  if (!wd.length) { pod.innerHTML = '<div class="empty"><i class="ti ti-trophy" aria-hidden="true"></i>Belum ada kode bulan ini</div>'; return; }
+  const rk = ['k1','k2','k3']; const ik = ['r1','',''];
+  pod.innerHTML = wd.map((c, i) => {
+    const topO = Object.entries(c.outlets).sort((a,b) => b[1]-a[1])[0];
+    return `<div class="pi ${ik[i]||''}"><div class="pi-rank ${rk[i]||'kn'}">${i<3?['🥇','🥈','🥉'][i]:i+1}</div><div style="flex:1"><div class="pi-name">${c.name}</div><div class="pi-sub">${topO?topO[0]:''}</div></div><div class="pi-count">${c.count}</div><div class="pi-bar-bg"><div class="pi-bar" style="width:${Math.round((c.count/max)*100)}%"></div></div></div>`;
+  }).join('');
+}
+
+function filterOutlet(btn, name) {
+  document.querySelectorAll('.chip:not(.modal .chip)').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active'); activeFilter = name; renderGrafik();
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.remove('hidden');
+  document.getElementById('gsUrl').value = getGsUrl();
+}
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.add('hidden'); });
+});
+
+let toastTimer = null;
+function showToast(msg, err = false) {
+  const el = document.getElementById('toast'); el.textContent = msg;
+  el.className = 'toast' + (err ? ' err' : ''); void el.offsetWidth; el.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// INIT
+if (getGsUrl()) { startSync(); }
+else { renderGrafik(); openModal('modal-settings'); }
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    if (syncTimer) clearInterval(syncTimer);
+    if (talentSyncTimer) clearInterval(talentSyncTimer);
+  } else if (getGsUrl()) {
+    startSync();
+  }
+});
+</script>
+</body>
+</html>
